@@ -34,7 +34,7 @@ const RegisterForm = () => {
                     {submitError && !dirtySinceLastSubmit && (
                         <ErrorMessage error={submitError} />
                     )}
-                    <Button disabled={invalid && !dirtySinceLastSubmit || pristine} loading={submitting} color='green' content='Register' fluid />
+                    <Button disabled={(invalid && !dirtySinceLastSubmit) || pristine} loading={submitting} color='green' content='Register' fluid />
                 </Form>
             )}
         />

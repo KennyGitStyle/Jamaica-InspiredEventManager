@@ -29,7 +29,7 @@ const LoginForm = () => {
                     {submitError && !dirtySinceLastSubmit && (
                         <ErrorMessage error={submitError} text='invalid email or password'/>
                     )}
-                    <Button disabled={invalid && !dirtySinceLastSubmit || pristine} loading={submitting} color='green' content='Login' fluid />
+                    <Button disabled={(invalid && !dirtySinceLastSubmit) || pristine} loading={submitting} color='green' content='Login' fluid />
                 </Form>
             )}
         />

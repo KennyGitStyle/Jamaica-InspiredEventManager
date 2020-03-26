@@ -5,6 +5,7 @@ import agent from '../api/agent';
 import { history } from '../..';
 import { toast } from 'react-toastify';
 import {RootStore} from './rootStore'
+import { setActivityProps, createAttendee } from '../common/util/Util';
 
 
 
@@ -19,6 +20,7 @@ export default class EventActivityStore {
     @observable loadingInitial = false;
     @observable submitting = false;
     @observable target= '';
+    @observable loading = false;
 
     @computed get eventActivitiesByDate() {
         return this.groupEventActivitiesByDate(Array.from(this.eventActivityRegistry.values()))
@@ -42,7 +44,7 @@ export default class EventActivityStore {
             const eventActivities = await agent.EventActivities.list();
             runInAction('loading event activities', () => {
                 eventActivities.forEach((event) => {
-                    event.date = new Date(event.date)
+                    setActivityProps(event, this.rootStore.userStore.user!)
                     this.eventActivityRegistry.set(event.id, event);
                   });
                   this.loadingInitial = false;
@@ -65,7 +67,7 @@ export default class EventActivityStore {
             try {
                 eventActivity = await agent.EventActivities.details(id);
                 runInAction('loading event', () => {
-                    eventActivity.date = new Date(eventActivity.date)
+                    setActivityProps(eventActivity, this.rootStore.userStore.user!)
                     this.activity = eventActivity;
                     this.eventActivityRegistry.set(eventActivity.id, eventActivity);
                     this.loadingInitial = false;
@@ -91,6 +93,12 @@ export default class EventActivityStore {
         this.submitting = true;
         try {
             await agent.EventActivities.create(event);
+            const attendee = createAttendee(this.rootStore.userStore.user!)
+            attendee.isHost = true
+            let attendees = []
+            attendees.push(attendee)
+            event.attendees = attendees
+            event.isHost = true
             runInAction('creating event activity', () => {
                 this.eventActivityRegistry.set(event.id, event);
                 this.submitting = false;
@@ -141,6 +149,50 @@ export default class EventActivityStore {
             })
             
             console.log(err)
+        }
+        
+    }
+
+    @action attendEventActivity = async () => {
+        const attendee = createAttendee(this.rootStore.userStore.user!)
+        this.loading = true
+        try {
+            await agent.EventActivities.attend(this.activity!.id)
+            runInAction(() => {
+                if(this.activity) {
+                    this.activity.attendees.push(attendee)
+                    this.activity.isGoing = true
+                    this.eventActivityRegistry.set(this.activity.id, this.activity);
+                    this.loading = false
+                 }
+            })
+        }catch (error) {
+            runInAction(() => {
+                this.loading = false
+            })
+            toast.error("Problem signing up to  event")
+        }
+    }
+
+    @action cancelAttendance = async () => {
+        this.loading = true
+        try {
+            await agent.EventActivities.unattend(this.activity!.id)
+            runInAction(() => {
+                if(this.activity) {
+                    this.activity.attendees = this.activity.attendees.filter(x => 
+                        x.username !== this.rootStore.userStore.user!.username)
+                    this.activity.isGoing = false
+                    this.eventActivityRegistry.set(this.activity.id, this.activity)
+                    this.loading = false
+                }
+            })
+            
+        } catch (error) {
+            runInAction(() => {
+                this.loading = false
+            })
+            toast.error("Problem cancelling attendance")
         }
         
     }

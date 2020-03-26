@@ -49,7 +49,9 @@ const EventActivities = {
     details: (id: string) => requests.get(`/activities/${id}`),
     create: (activity: IEventActivity) => requests.post('/activities', activity),
     update: (activity: IEventActivity) => requests.put(`/activities/${activity.id}`, activity),
-    delete: (id: string) => requests.delete(`/activities/${id}`)
+    delete: (id: string) => requests.delete(`/activities/${id}`),
+    attend: (id: string) => requests.post(`/activities/${id}/attend`, {}),
+    unattend: (id: string) => requests.delete(`/activities/${id}/attend`)
 
 }
 

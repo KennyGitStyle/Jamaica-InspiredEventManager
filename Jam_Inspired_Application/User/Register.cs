@@ -50,11 +50,11 @@ namespace Jam_Inspired_Application.User
             public async Task<User> Handle(Command request, CancellationToken cancellationToken)
             {
                 //TODO : handler logic
-                if(await _context.Users.Where(x => x.Email == request.Email).AnyAsync()) {
+                if(await _context.Users.AnyAsync(x => x.Email == request.Email)) {
                     throw new RestExceptionHandling(HttpStatusCode.BadRequest, new {Email = "Email already exist!"});
                 }
 
-                if(await _context.Users.Where(x => x.UserName == request.Username).AnyAsync()) {
+                if(await _context.Users.AnyAsync(x => x.UserName == request.Username)) {
                     throw new RestExceptionHandling(HttpStatusCode.BadRequest, new {Username = "Username already exist!"});
                 }
 

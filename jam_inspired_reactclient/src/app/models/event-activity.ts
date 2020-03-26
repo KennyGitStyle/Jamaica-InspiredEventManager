@@ -6,6 +6,9 @@ export interface IEventActivity {
     date: Date;
     city: string;
     venue: string;
+    isGoing: boolean;
+    isHost: boolean;
+    attendees: IEventAttendee[]
 
 }
 
@@ -22,6 +25,7 @@ export class EventActivityFormValues implements IEventActivityFormValues {
     time?: Date = undefined;
     city: string = '';
     venue: string = '';
+    
 
     /**
      *
@@ -32,4 +36,11 @@ export class EventActivityFormValues implements IEventActivityFormValues {
         }
         Object.assign(this, init)
     }
+}
+
+export interface IEventAttendee {
+    username: string
+    displayName: string
+    image: string
+    isHost: boolean
 }
