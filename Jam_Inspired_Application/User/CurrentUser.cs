@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Jam_Inspired_Application.Interfaces;
@@ -34,7 +35,7 @@ namespace Jam_Inspired_Application.User
                   DisplayName = user.DisplayName,
                   Username = user.UserName,
                   Token = _jwtGenerator.CreateToken(user),
-                  Image = null
+                  Image = user.Photos.FirstOrDefault(x => x.IsMain)?.Url
                 };
             }
         }
